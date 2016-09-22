@@ -1,12 +1,13 @@
 # coding: utf-8
 import os
-import cv2
+import sys
 import Tkinter
 from PIL import ImageTk
 import matplotlib.pyplot as plot
 import DogOrCatEvaluate as doce
 import image_process as ip
 import take_picture as tp
+import take_face_picture as tfp
 
 # カメラから取得する画像のサイズと保存ファイルパス
 PICTURE_WIDTH = 300
@@ -66,8 +67,11 @@ class DemoWindow:
     #
     # コンストラクタ
     #
-    def __init__(self, model_file_path):
+    def __init__(self, model_file_path, face_detection=False):
         self.__init__temporary()
+
+        # 顔検出を行うかのフラグ
+        self.__face_detection = face_detection
 
         self.doc = doce.DogOrCatEvaluate(model_file_path)
         plot.rcParams.update({'font.size': 20})
@@ -139,9 +143,15 @@ class DemoWindow:
         self.label_result.config(text='')
 
         # カメラから画像を取得
-        tp.take_picture(device_no=1,
-                        size=(CAMERA_VIEW_WIDTH, CAMERA_VIEW_HEIGHT),
-                        save_file=self.__temp_face_file)
+        if self.__face_detection:
+            tfp.take_face_picture(device_no=1,
+                                  size=(CAMERA_VIEW_WIDTH * 2, CAMERA_VIEW_HEIGHT * 2),
+                                  save_file=self.__temp_face_file)
+        else:
+            tp.take_picture(device_no=1,
+                            size=(CAMERA_VIEW_WIDTH, CAMERA_VIEW_HEIGHT),
+                            save_file=self.__temp_face_file)
+
         # 画像を取得した場合は、表示
         if os.path.isfile(self.__temp_face_file):
             ip.trimming_square(self.__temp_face_file)
@@ -187,4 +197,11 @@ class DemoWindow:
 # ※動作確認用コード
 #
 if __name__ == "__main__":
-    main_window = DemoWindow('./model/doc2016.ckpt')
+    face_detection = False
+    for param in sys.argv:
+        if param == '-fd':
+            face_detection = True
+
+    # 画面を表示
+    main_window = DemoWindow('./model/doc2016.ckpt',
+                             face_detection=face_detection)

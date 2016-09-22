@@ -137,7 +137,8 @@ class DogOrCatEvaluate:
 #
 if __name__ == "__main__":
     # 評価用画像のディレクトリ
-    EVAL_IMAGE_DIR = './data/human'
+    # EVAL_IMAGE_DIR = './data/human'
+    EVAL_IMAGE_DIR = './data/div32'
 
     # 評価モデルを作成
     doc = DogOrCatEvaluate('./model/doc2016.ckpt')
@@ -146,4 +147,4 @@ if __name__ == "__main__":
     eval_images = os.listdir(EVAL_IMAGE_DIR)
     for eval_image in eval_images:
         score = doc.evaluate(os.path.join(EVAL_IMAGE_DIR, eval_image))
-        print ', '.join([eval_image, 'dog: ' + str(score[0]), 'cat: ' + str(score[1])])
+        print ','.join([eval_image, 'dog:' + str(score[0]), 'cat:' + str(score[1])])
